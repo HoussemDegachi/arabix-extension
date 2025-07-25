@@ -1,0 +1,31 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+    box-sizing: border-box;
+    font-family: "Roboto", "sans-serif";
+    padding: 0;
+    margin: 0;
+}
+
+.label {
+    @apply text-labels text-[12px] font-[500];
+}
+
+.main-stat {
+    @apply font-bold text-2xl;
+}
+
+.max-stat {
+    @apply text-labels text-sm ml-[3px];
+}
+
+.secondary-stat {
+    @apply font-bold text-base;
+}
+
+.main-btn {
+    @apply text-white text-base rounded-[10px] px-4 py-[10px] flex items-center gap-1 duration-300;
+}
