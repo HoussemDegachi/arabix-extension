@@ -2,8 +2,27 @@
   "name": "arabix",
   "displayName": "Arabix",
   "version": "0.0.1",
-  "description": "A basic Plasmo extension.",
+  "description": "An ultimate solution to the arabizi problem.",
   "author": "Houssem Degachi",
+  "manifest": {
+    "permissions": ["commands"],
+     "commands": {
+      "transliterateInput": {
+        "suggested_key": {
+          "default": "Alt+T"
+        },
+        "description": "Transliterate an input to Arabic script"
+      },
+        "_execute_action": {
+      "suggested_key": {
+        "default": "Alt+A"
+      }
+    }
+    },
+    "host_permissions": [
+      "https://*/*"
+    ]
+  },
   "scripts": {
     "dev": "plasmo dev",
     "build": "plasmo build",
@@ -29,10 +48,5 @@
     "prettier": "3.2.4",
     "tailwindcss": "3",
     "typescript": "5.3.3"
-  },
-  "manifest": {
-    "host_permissions": [
-      "https://*/*"
-    ]
   }
 }

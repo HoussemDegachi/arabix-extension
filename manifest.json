@@ -1,0 +1,18 @@
+{
+  "manifest": {
+    "permissions": ["commands"],
+    "commands": {
+      "transliterateInput": {
+        "suggested_key": {
+          "default": "Alt+T"
+        },
+        "description": "Transliterate an input to Arabic script"
+      },
+        "_execute_action": {
+      "suggested_key": {
+        "default": "Alt+T"
+      }
+    }
+    }
+  }
+}
