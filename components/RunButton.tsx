@@ -1,10 +1,13 @@
-import React, { useState } from "react"
+import React, { useEffect } from "react"
 
 import startIcon from "../assets/icon/start.svg"
 import stopIcon from "../assets/icon/stop.svg"
+import { useStorage } from "@plasmohq/storage/hook"
 
 function RunButton() {
-  const [isRunning, setIsRunning] = useState<boolean>(false)
+  const [isRunning, setIsRunning] = useStorage("isAppRunning", true)
+
+
   return (
     <>
       {isRunning ? (

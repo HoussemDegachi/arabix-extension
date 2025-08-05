@@ -1,0 +1,1 @@
+export type Usage = [{"date": string, "usage": number}]

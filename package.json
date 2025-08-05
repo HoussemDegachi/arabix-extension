@@ -5,19 +5,22 @@
   "description": "An ultimate solution to the arabizi problem.",
   "author": "Houssem Degachi",
   "manifest": {
-    "permissions": ["commands"],
-     "commands": {
+    "permissions": [
+      "commands",
+      "storage"
+    ],
+    "commands": {
       "transliterateInput": {
         "suggested_key": {
           "default": "Alt+T"
         },
         "description": "Transliterate an input to Arabic script"
       },
-        "_execute_action": {
-      "suggested_key": {
-        "default": "Alt+A"
+      "_execute_action": {
+        "suggested_key": {
+          "default": "Alt+A"
+        }
       }
-    }
     },
     "host_permissions": [
       "https://*/*"
@@ -29,6 +32,7 @@
     "package": "plasmo package"
   },
   "dependencies": {
+    "@plasmohq/storage": "^1.15.0",
     "axios": "^1.11.0",
     "chart.js": "^4.5.0",
     "dayjs": "^1.11.13",

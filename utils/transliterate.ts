@@ -62,17 +62,34 @@ function simulateUserTextInput(el: Element, text: string) {
   }
 }
 
+function loadingTextAnimation(selectedElement) {
+  let loadingStr = "";
+  let asc = true;
+  return setInterval(() => {
+    if (loadingStr.length === 3 && asc) asc = false
+    else if (loadingStr.length === 0 && !asc) asc = true
+
+    if (asc) loadingStr += '.'
+    else loadingStr = loadingStr.slice(0, loadingStr.length - 1)
+    simulateUserTextInput(selectedElement, loadingStr)
+  }, 500)
+}
+
 export const transliterateSelectedInput = () => {
+  let loadingInt;
   const selectedElement = getSelectedInput()
   if (!selectedElement) return
   const text = selectedElement[getAccessForInstanceType(selectedElement)]
   if (!text) return
+  console.log("Running animation")
+  loadingInt = loadingTextAnimation(selectedElement)
   chrome.runtime.sendMessage(
     {
       type: "transliterate",
       payload: { text }
     },
     (response) => {
+      clearInterval(loadingInt)
       if (response.error) {
         console.error("An error occured", response.error)
       } else {
