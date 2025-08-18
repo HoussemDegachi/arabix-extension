@@ -4,8 +4,8 @@ import { Storage } from "@plasmohq/storage"
   ;import { generateInitialUsage, increaseUsage } from "~utils/usage";
 import type { Usage } from "~types/Usage";
 import dayjs from "dayjs";
+import { getTempTransliteration } from "~utils/temp";
  (async () => {
-
    const storage = new Storage();
    const today = dayjs().format("MMM D")
    let isAppRunning: boolean = await storage.get("isAppRunning");
@@ -39,7 +39,6 @@ import dayjs from "dayjs";
     })
     
     const backend_url = process.env.PLASMO_PUBLIC_BACKEND_URL
-    console.log(backend_url)
     
     chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       if (request.type == "transliterate") {
@@ -48,14 +47,19 @@ import dayjs from "dayjs";
         storage.set("allTimeUsage", allTimeUsage + 1)
         const { text } = request.payload
         console.log(`Message recieve (translitrate): ${text}`)
-        axios
-        .post(`${backend_url}/transliterate`, { text })
-        .then((data) => {
+        // axios
+        // .post(`${backend_url}/transliterate`, { text })
+        // .then((data) => {
+        //   console.log("Recieved data")
+        //   console.log(data)
+        //   return sendResponse(data)
+        // })
+        // .catch((err) => sendResponse({ error: err.message }))
+        getTempTransliteration(text).then((res: string) => {
           console.log("Recieved data")
-          console.log(data)
-          return sendResponse(data)
+          console.log(res)
+          return sendResponse({data: {text: res}})
         })
-        .catch((err) => sendResponse({ error: err.message }))
         return true
       }
     })

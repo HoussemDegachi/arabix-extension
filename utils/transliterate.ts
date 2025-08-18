@@ -75,28 +75,80 @@ function loadingTextAnimation(selectedElement) {
   }, 500)
 }
 
-export const transliterateSelectedInput = () => {
+let animationQueue: (string | null)[] = [];
+function appendTextWithAnimation(selectedElement) {
+  // let animationInteval = setInterval(() => {
+  //   const text = selectedElement[getAccessForInstanceType(selectedElement)];
+  //   if (!word) {
+  //     simulateUserTextInput(selectedElement, text + " ")
+  //     clearInterval(animationInteval)
+  //     return
+  //   }
+  //   simulateUserTextInput(selectedElement, text + word[0])
+  //   word = word.substring(1)
+  // }, 100)
+  let animationInteval = setInterval(() => {
+    const text = selectedElement[getAccessForInstanceType(selectedElement)];
+    if (animationQueue.length == 0) return
+    else if (animationQueue[0] === null) {
+      clearInterval(animationInteval)
+      animationQueue = []
+      simulateUserTextInput(selectedElement, text.trim())
+      return
+    }
+    let word = animationQueue[0]
+    if (word === "") {
+      simulateUserTextInput(selectedElement, text + " ")
+      animationQueue = animationQueue.slice(1)
+      return
+    }
+    simulateUserTextInput(selectedElement, text + word[0])
+    animationQueue[0] = word.substring(1);
+  }, 80)
+}
+
+export const getTransliteration = async (word: string): Promise<string> => {
+  return new Promise((resolve, reject) => {
+
+    chrome.runtime.sendMessage(
+      {
+        type: "transliterate",
+        payload: { text: word }
+      },
+      (response: { error?: string, data?: { text: string } }) => {
+        if (response.error) {
+          console.error("An error occured", response.error)
+          reject(response.error)
+        } else {
+          console.log("React: recieved response")
+          console.log(response)
+          resolve(response.data.text)
+        }
+      }
+    )
+  }
+  )
+}
+
+export const transliterateSelectedInput = async (current?: Element) => {
   let loadingInt;
-  const selectedElement = getSelectedInput()
+  const selectedElement = current ? current : getSelectedInput()
   if (!selectedElement) return
   const text = selectedElement[getAccessForInstanceType(selectedElement)]
   if (!text) return
   console.log("Running animation")
   loadingInt = loadingTextAnimation(selectedElement)
-  chrome.runtime.sendMessage(
-    {
-      type: "transliterate",
-      payload: { text }
-    },
-    (response) => {
+
+  appendTextWithAnimation(selectedElement)
+  for (let word of text.split(" ")) {
+    let transliteratedWord = await getTransliteration(word);
+    if (loadingInt) {
       clearInterval(loadingInt)
-      if (response.error) {
-        console.error("An error occured", response.error)
-      } else {
-        console.log("React: recieved response")
-        console.log(response)
-        simulateUserTextInput(selectedElement, response.data.text)
-      }
-    }
-  )
+      loadingInt = null
+      simulateUserTextInput(selectedElement, " ")
+    };
+    console.log(transliteratedWord)
+    animationQueue.push(transliteratedWord)
+  }
+  animationQueue.push(null)
 }

@@ -19,9 +19,9 @@ function IndexPopup() {
         <QuickSettings />
         <QuickTransliterate />
       </main>
-      <footer className="border-t-2 border-label py-[12px] px-px_base">
+      {/* <footer className="border-t-2 border-label py-[12px] px-px_base">
         <Footer />
-      </footer>
+      </footer> */}
     </div>
   )
 }
