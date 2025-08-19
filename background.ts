@@ -1,11 +1,11 @@
 import { Storage } from "@plasmohq/storage"
+import posthog from 'posthog-js/dist/module.no-external'
 
-  ; import { generateInitialUsage } from "~utils/usage";
+  ; import { generateInitialUsage, increaseUsage } from "~utils/usage";
 import type { Usage } from "~types/Usage";
 import dayjs from "dayjs";
 import { getTempTransliteration } from "~utils/api";
-import { createToast } from "~utils/toast"
-import { createToastByBackground } from "~utils/background/helpers";
+import { createToastByBackground, logInUser } from "~utils/background/helpers";
 
 (async () => {
   const storage = new Storage();
@@ -40,8 +40,20 @@ import { createToastByBackground } from "~utils/background/helpers";
     }
   })
   const backend_url = process.env.PLASMO_PUBLIC_BACKEND_URL
+  const posthog_key = process.env.PLASMO_PUBLIC_POSTHOG_KEY
 
-  chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (posthog_key) {
+    posthog.init(posthog_key,
+      {
+        api_host: 'https://eu.i.posthog.com',
+        person_profiles: 'always'
+      }
+    )
+  }
+
+  let isUserLoggedIn = await logInUser()
+
+  chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
     if (request.type == "transliterate") {
       const { text } = request.payload
       console.log(`Message recieve (translitrate): ${text}`)
@@ -60,6 +72,16 @@ import { createToastByBackground } from "~utils/background/helpers";
       const { message, toastType } = request.payload
       console.log("Creating toast")
       createToastByBackground(message, toastType)
+    }
+
+    if (request.type == "log" && posthog_key) {
+      const { logType, numberOfWords, numberOfLetters } = request.payload
+      const newUsageLog: Usage = increaseUsage(usageLog)
+      storage.set("usageLog", newUsageLog)
+      storage.set("allTimeUsage", allTimeUsage + 1)
+      if (!isUserLoggedIn) isUserLoggedIn = await logInUser()
+        console.log(logType, { numberOfWords, numberOfLetters })
+      posthog.capture(logType, { numberOfWords, numberOfLetters })
     }
   })
 

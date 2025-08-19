@@ -1,6 +1,3 @@
-import type { Usage } from "~types/Usage";
-import { increaseUsage } from "./usage"
-import { Storage } from "@plasmohq/storage"
 import { isTransliteratable } from "./api";
 
 
@@ -201,13 +198,15 @@ const cleanSplittedWords = (words: string[]): string[] => {
   return res
 }
 
-const countApiCall = async () => {
-    const storage = new Storage();
-  let usageLog: Usage = await storage.get("usageLog")
-  let allTimeUsage: number = await storage.get("allTimeUsage")
-  const newUsageLog: Usage = increaseUsage(usageLog)
-  storage.set("usageLog", newUsageLog)
-  storage.set("allTimeUsage", allTimeUsage + 1)
+const countApiCall = async (text: string) => {
+  chrome.runtime.sendMessage({
+    type: "log",
+    payload: {
+      logType: "inputTransliteration",
+      numberOfWords: text.split(" ").length,
+      numberOfLetters: text.length
+    }
+  })
 }
 
 export const transliterateSelectedInput = async (current?: Element) => {
@@ -224,7 +223,6 @@ export const transliterateSelectedInput = async (current?: Element) => {
   // toggleModifyState(selectedElement)
   appendTextWithAnimation(selectedElement)
   console.log("Recieved text in client", text)
-  console.log(cleanSplittedWords(splitBySpaceOutOfIgnore(text)))
   let isApiCallCounted = false
   for (let word of cleanSplittedWords(splitBySpaceOutOfIgnore(text))) {
     console.log("from content", word)
@@ -232,7 +230,7 @@ export const transliterateSelectedInput = async (current?: Element) => {
 
     if (!isApiCallCounted && transliteratedWord != word) {
       isApiCallCounted = true
-      countApiCall()
+      countApiCall(text)
     }
 
     if (loadingInt) {
