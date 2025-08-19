@@ -201,13 +201,16 @@ const cleanSplittedWords = (words: string[]): string[] => {
   return res
 }
 
-export const transliterateSelectedInput = async (current?: Element) => {
-  const storage = new Storage();
+const countApiCall = async () => {
+    const storage = new Storage();
   let usageLog: Usage = await storage.get("usageLog")
   let allTimeUsage: number = await storage.get("allTimeUsage")
   const newUsageLog: Usage = increaseUsage(usageLog)
   storage.set("usageLog", newUsageLog)
   storage.set("allTimeUsage", allTimeUsage + 1)
+}
+
+export const transliterateSelectedInput = async (current?: Element) => {
 
   let loadingInt;
   const selectedElement = current ? current : getSelectedInput()
@@ -222,9 +225,16 @@ export const transliterateSelectedInput = async (current?: Element) => {
   appendTextWithAnimation(selectedElement)
   console.log("Recieved text in client", text)
   console.log(cleanSplittedWords(splitBySpaceOutOfIgnore(text)))
+  let isApiCallCounted = false
   for (let word of cleanSplittedWords(splitBySpaceOutOfIgnore(text))) {
     console.log("from content", word)
     let transliteratedWord = await getTransliteration(word);
+
+    if (!isApiCallCounted && transliteratedWord != word) {
+      isApiCallCounted = true
+      countApiCall()
+    }
+
     if (loadingInt) {
       clearInterval(loadingInt)
       loadingInt = null

@@ -1,9 +1,12 @@
 import { Storage } from "@plasmohq/storage"
 
-  ; import { generateInitialUsage, increaseUsage } from "~utils/usage";
+  ; import { generateInitialUsage } from "~utils/usage";
 import type { Usage } from "~types/Usage";
 import dayjs from "dayjs";
 import { getTempTransliteration } from "~utils/api";
+import { createToast } from "~utils/toast"
+import { createToastByBackground } from "~utils/background/helpers";
+
 (async () => {
   const storage = new Storage();
   const today = dayjs().format("MMM D")
@@ -36,7 +39,6 @@ import { getTempTransliteration } from "~utils/api";
       allTimeUsage = c.newValue
     }
   })
-
   const backend_url = process.env.PLASMO_PUBLIC_BACKEND_URL
 
   chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
@@ -47,8 +49,17 @@ import { getTempTransliteration } from "~utils/api";
         console.log("Recieved data")
         console.log(res)
         return sendResponse({ data: { text: res } })
+      }).catch((err) => {
+        createToastByBackground(err, "error")
+        return sendResponse({ data: { text: text } })
       })
       return true
+    }
+
+    if (request.type == "createToast") {
+      const { message, toastType } = request.payload
+      console.log("Creating toast")
+      createToastByBackground(message, toastType)
     }
   })
 

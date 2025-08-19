@@ -46,6 +46,6 @@ export const getTempTransliteration = async (word: string): (Promise<string> | n
         return candidates[0];
     } catch (error) {
         console.error("Error fetching transliteration:", error);
-        return null;
+        throw `Unable to make api calls: ${error.message}`
     }
 }
