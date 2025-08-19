@@ -1,3 +1,10 @@
+import type { Usage } from "~types/Usage";
+import { increaseUsage } from "./usage"
+import { Storage } from "@plasmohq/storage"
+import { isTransliteratable } from "./api";
+
+
+
 const getSelectedInput = (): Element => {
   const selectedElement = document.activeElement
   if (
@@ -130,7 +137,78 @@ export const getTransliteration = async (word: string): Promise<string> => {
   )
 }
 
+const getToggleStateForInstance = (element: Element) => {
+  if (
+    element instanceof HTMLInputElement ||
+    element instanceof HTMLTextAreaElement
+  )
+    return "readonly"
+  else if (element instanceof HTMLElement) return "contenteditable"
+  else return
+}
+
+const toggleModifyState = (element: Element) => {
+  const currentState = element[getToggleStateForInstance(element)]
+  currentState[getToggleStateForInstance(element)] = !currentState;
+}
+
+const splitBySpaceOutOfIgnore = (str: string): string[] => {
+  const res: string[] = []
+  const normalSplit: string[] = str.split(" ")
+  let i = 0
+  while (i < normalSplit.length) {
+    console.log(i)
+    if (!normalSplit[i].includes("/ignore{")) {
+      res.push(normalSplit[i])
+      i++
+      continue
+    }
+    let word: string[] = []
+    while (!normalSplit[i].includes("}")) { word.push(normalSplit[i]); i++ }
+    word.push(normalSplit[i])
+    res.push(word.join(" "))
+    i++;
+  }
+  return res
+}
+
+const cleanSplittedWords = (words: string[]): string[] => {
+  const res: string[] = []
+  const containsAlphaNumericRegex = new RegExp("[A-Za-z0-9]")
+  const containsNonAlphaNumericRegex = new RegExp("[^A-Za-z0-9]")
+  for (let word of words) {
+    if (!isTransliteratable(word) || word.includes("/ignore{")) {
+      res.push(word)
+      continue
+    }
+
+    let i = 0;
+    let j = 1;
+    while (j <= word.length) {
+      let substring = word.substring(i, j)
+      if (containsAlphaNumericRegex.test(substring) && containsNonAlphaNumericRegex.test(substring)) {
+        res.push(word.substring(i, j - 1))
+        i = j - 1
+      } else j++
+
+      if (j > word.length && (containsAlphaNumericRegex.test(substring) && containsNonAlphaNumericRegex.test(substring))) {
+        res.push(word[j - 2])
+      } else if (j > word.length) {
+        res.push(substring)
+      }
+    }
+  }
+  return res
+}
+
 export const transliterateSelectedInput = async (current?: Element) => {
+  const storage = new Storage();
+  let usageLog: Usage = await storage.get("usageLog")
+  let allTimeUsage: number = await storage.get("allTimeUsage")
+  const newUsageLog: Usage = increaseUsage(usageLog)
+  storage.set("usageLog", newUsageLog)
+  storage.set("allTimeUsage", allTimeUsage + 1)
+
   let loadingInt;
   const selectedElement = current ? current : getSelectedInput()
   if (!selectedElement) return
@@ -139,8 +217,13 @@ export const transliterateSelectedInput = async (current?: Element) => {
   console.log("Running animation")
   loadingInt = loadingTextAnimation(selectedElement)
 
+
+  // toggleModifyState(selectedElement)
   appendTextWithAnimation(selectedElement)
-  for (let word of text.split(" ")) {
+  console.log("Recieved text in client", text)
+  console.log(cleanSplittedWords(splitBySpaceOutOfIgnore(text)))
+  for (let word of cleanSplittedWords(splitBySpaceOutOfIgnore(text))) {
+    console.log("from content", word)
     let transliteratedWord = await getTransliteration(word);
     if (loadingInt) {
       clearInterval(loadingInt)
@@ -150,5 +233,6 @@ export const transliterateSelectedInput = async (current?: Element) => {
     console.log(transliteratedWord)
     animationQueue.push(transliteratedWord)
   }
+  // toggleModifyState(selectedElement)
   animationQueue.push(null)
 }
