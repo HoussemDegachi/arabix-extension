@@ -79,7 +79,7 @@ import { createToastByBackground, logInUser } from "~utils/background/helpers";
       const newUsageLog: Usage = increaseUsage(usageLog)
       storage.set("usageLog", newUsageLog)
       storage.set("allTimeUsage", allTimeUsage + 1)
-      if (!isUserLoggedIn) isUserLoggedIn = await logInUser()
+      if (!isUserLoggedIn || !storage.get("userId")) isUserLoggedIn = await logInUser()
         console.log(logType, { numberOfWords, numberOfLetters })
       posthog.capture(logType, { numberOfWords, numberOfLetters })
     }

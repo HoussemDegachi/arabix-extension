@@ -4,6 +4,9 @@
   "version": "0.0.1",
   "description": "Convert Arabizi (Arabic in Latin letters) to Arabic script instantly with a keyboard shortcut on most websites.",
   "author": "Houssem Degachi",
+  "content_security_policy": {
+    "extension_pages": "default-src 'self';connect-src * data: blob: filesystem:;style-src 'self' data: 'unsafe-inline';img-src 'self' data:;frame-src 'self' data:;font-src 'self' data:;media-src * data: blob: filesystem:;"
+  },
   "manifest": {
     "permissions": [
       "commands",
@@ -33,7 +36,6 @@
     "package": "plasmo package"
   },
   "dependencies": {
-    "@fingerprintjs/fingerprintjs": "^4.6.2",
     "@plasmohq/storage": "^1.15.0",
     "axios": "^1.11.0",
     "chart.js": "^4.5.0",
