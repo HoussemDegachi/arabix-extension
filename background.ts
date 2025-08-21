@@ -4,7 +4,7 @@ import posthog from 'posthog-js/dist/module.no-external'
   ; import { generateInitialUsage, increaseUsage } from "~utils/usage";
 import type { Usage } from "~types/Usage";
 import dayjs from "dayjs";
-import { getTempTransliteration } from "~utils/api";
+import { getApiTransliteration } from "~utils/api";
 import { createToastByBackground, logInUser } from "~utils/background/helpers";
 
 (async () => {
@@ -57,7 +57,7 @@ import { createToastByBackground, logInUser } from "~utils/background/helpers";
     if (request.type == "transliterate") {
       const { text } = request.payload
       console.log(`Message recieve (translitrate): ${text}`)
-      getTempTransliteration(text).then((res: string) => {
+      getApiTransliteration(text).then((res: string) => {
         console.log("Recieved data")
         console.log(res)
         return sendResponse({ data: { text: res } })

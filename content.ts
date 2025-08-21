@@ -2,6 +2,12 @@ import { createToast } from "~utils/toast"
 import { transliterateSelectedInput } from "~utils/transliterate"
 import FingerprintJS from "@fingerprintjs/fingerprintjs"
 
+let port;
+window.addEventListener('pageshow', (event) => {
+  if (event.persisted) {
+    port = chrome.runtime.connect();
+  }
+});
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === "getInputToTransliterate") {

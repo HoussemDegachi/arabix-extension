@@ -28,10 +28,9 @@ const getIgnoredWord = (str: string) => {
 }
 
 
-export const getTempTransliteration = async (word: string): (Promise<string> | null) => {
+export const getApiTransliteration = async (word: string): (Promise<string> | null) => {
 
     const url = `https://api.yamli.com/transliterate.ashx?word=${encodeURIComponent(word)}&tool=api&account_id=000006&prot=https&hostname=AliMZaini&path=yamli-api&build=5515`;
-
     if (!isTransliteratable(word)) return word
 
     const ignoredWord = getIgnoredWord(word)

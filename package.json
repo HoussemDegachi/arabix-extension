@@ -2,7 +2,7 @@
   "name": "arabix",
   "displayName": "Arabix",
   "version": "0.0.1",
-  "description": "An ultimate solution to the arabizi problem.",
+  "description": "Convert Arabizi (Arabic in Latin letters) to Arabic script instantly with a keyboard shortcut on most websites.",
   "author": "Houssem Degachi",
   "manifest": {
     "permissions": [
@@ -25,10 +25,7 @@
     "host_permissions": [
       "https://*.posthog.com/*",
       "https://api.yamli.com/*"
-    ],
-    "content-security-policy": {
-      "extension_pages": "script-src 'self'; object-src 'self'; connect-src 'self' https://*.posthog.com/* https://api.yamli.com/;"
-    }
+    ]
   },
   "scripts": {
     "dev": "plasmo dev",

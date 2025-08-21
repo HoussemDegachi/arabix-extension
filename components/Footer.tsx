@@ -3,7 +3,7 @@ import upgrade from "../assets/icon/upgrade.svg"
 
 function Footer() {
   return (
-    <div className='flex justify-between'>
+    <div className='text-center'>
       {/* <figure className='flex gap-2 items-center'>
         <div className="w-[22px] h-[22px] rounded-full bg-gray-500"></div>
         <p className='font-bold text-[14px] text-[#1e1e1e]'>User n...</p>
@@ -12,6 +12,7 @@ function Footer() {
         <img src={upgrade} className='w-[18px]' alt="upgrade" />
         Upgrade to pro
       </button> */}
+      <a className='label' href="https://forms.gle/vJggLeYwRx3iTRU58" target='_blank'>Send Feedback (Bugs & Suggestions)</a>
     </div>
   )
 }

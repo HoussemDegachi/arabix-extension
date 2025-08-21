@@ -7,7 +7,7 @@ const getSelectedInput = (): Element => {
   if (
     !selectedElement ||
     (selectedElement instanceof HTMLElement &&
-      !selectedElement.isContentEditable &&
+      !(selectedElement.contentEditable != "false") &&
       !(selectedElement instanceof HTMLInputElement) &&
       !(selectedElement instanceof HTMLTextAreaElement))
   )
@@ -21,11 +21,21 @@ const getAccessForInstanceType = (selectedElement: Element): string => {
     selectedElement instanceof HTMLTextAreaElement
   )
     return "value"
-  else if (selectedElement instanceof HTMLElement) return "innerText"
+  else if (selectedElement instanceof HTMLElement) return "textContent"
   else return
 }
 
+function isAppendableTextArea(element: Element) {
+const divOrSpanChildren = Array.from(element.childNodes)
+  .filter(node =>
+    node.nodeType === Node.ELEMENT_NODE &&
+    (node.nodeName === 'DIV' || node.nodeName === 'SPAN' || node.nodeName === 'P')
+  );
+  return divOrSpanChildren.length === 0
+}
+
 function simulateUserTextInput(el: Element, text: string) {
+  console.log(isAppendableTextArea(el))
   if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) {
     el.focus()
 
@@ -36,7 +46,7 @@ function simulateUserTextInput(el: Element, text: string) {
       cancelable: true
     })
     el.dispatchEvent(event)
-  } else if (el instanceof HTMLElement && el.isContentEditable) {
+  } else if (el instanceof HTMLElement && el.contentEditable && el.contentEditable != "false" && !isAppendableTextArea(el)) {
     el.focus()
 
     const selection = window.getSelection()
@@ -63,6 +73,8 @@ function simulateUserTextInput(el: Element, text: string) {
       cancelable: true
     })
     el.dispatchEvent(insertEvent)
+  } else if (el instanceof HTMLElement && el.isContentEditable) {
+    el.innerText = text;
   }
 }
 
@@ -81,16 +93,6 @@ function loadingTextAnimation(selectedElement) {
 
 let animationQueue: (string | null)[] = [];
 function appendTextWithAnimation(selectedElement) {
-  // let animationInteval = setInterval(() => {
-  //   const text = selectedElement[getAccessForInstanceType(selectedElement)];
-  //   if (!word) {
-  //     simulateUserTextInput(selectedElement, text + " ")
-  //     clearInterval(animationInteval)
-  //     return
-  //   }
-  //   simulateUserTextInput(selectedElement, text + word[0])
-  //   word = word.substring(1)
-  // }, 100)
   let animationInteval = setInterval(() => {
     const text = selectedElement[getAccessForInstanceType(selectedElement)];
     if (animationQueue.length == 0) return
