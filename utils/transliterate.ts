@@ -125,11 +125,11 @@ export const getTransliteration = async (word: string): Promise<string> => {
       (response: { error?: string, data?: { text: string } }) => {
         clearTimeout(timeoutId)
         if (response?.error) {
-          console.error("An error occured", response.error)
+          // console.error("An error occured", response.error)
           reject(response.error)
         } else if (response?.data) {
-          console.log("React: recieved response")
-          console.log(response)
+          // console.log("React: recieved response")
+          // console.log(response)
           resolve(response.data.text)
         } else {
           reject(new Error('Invalid response format'));
@@ -228,10 +228,10 @@ export const transliterateSelectedInput = async (current?: Element) => {
 
   // toggleModifyState(selectedElement)
   appendTextWithAnimation(selectedElement)
-  console.log("Recieved text in client", text)
+  // console.log("Recieved text in client", text)
   let isApiCallCounted = false
   for (let word of cleanSplittedWords(splitBySpaceOutOfIgnore(text))) {
-    console.log("from content", word)
+    // console.log("from content", word)
     let transliteratedWord = await getTransliteration(word);
 
     if (!isApiCallCounted && transliteratedWord != word) {
@@ -244,7 +244,7 @@ export const transliterateSelectedInput = async (current?: Element) => {
       loadingInt = null
       simulateUserTextInput(selectedElement, " ")
     };
-    console.log(transliteratedWord)
+    // console.log(transliteratedWord)
     animationQueue.push(transliteratedWord)
   }
   // toggleModifyState(selectedElement)

@@ -56,26 +56,26 @@ import { createToastByBackground, logInUser } from "~utils/background/helpers";
   chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
     if (request.type == "transliterate") {
       const { text } = request.payload
-      console.log(`Message recieve (translitrate): ${text}`)
+      // console.log(`Message recieve (translitrate): ${text}`)
       getApiTransliteration(text).then((res: string | null) => {
         if (res == null) {sendResponse({data: {data: text}})}
         else {
 
-          console.log("Recieved data")
-          console.log(res)
+          // console.log("Recieved data")
+          // console.log(res)
           sendResponse({ data: { text: res } })
         }
       }).catch((err) => {
-        console.log("transliteration err", err)
+        // console.log("transliteration err", err)
         createToastByBackground(err, "error")
-        return sendResponse({ data: { text: text } })
+        sendResponse({ data: { text: text } })
       })
       return true
     }
 
     if (request.type == "createToast") {
       const { message, toastType } = request.payload
-      console.log("Creating toast")
+      // console.log("Creating toast")
       createToastByBackground(message, toastType)
     }
 
@@ -85,9 +85,8 @@ import { createToastByBackground, logInUser } from "~utils/background/helpers";
       storage.set("usageLog", newUsageLog)
       storage.set("allTimeUsage", allTimeUsage + 1)
       if (!isUserLoggedIn || !storage.get("userId")) isUserLoggedIn = await logInUser()
-        console.log(logType, { numberOfWords, numberOfLetters })
+        // console.log(logType, { numberOfWords, numberOfLetters })
       posthog.capture(logType, { numberOfWords, numberOfLetters })
-      return true
     }
   })
 

@@ -10,7 +10,7 @@ window.addEventListener('pageshow', (event) => {
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === "getInputToTransliterate") {
-    console.log("Shortcut triggered from background!")
+    // console.log("Shortcut triggered from background!")
     transliterateSelectedInput()
   }
 
