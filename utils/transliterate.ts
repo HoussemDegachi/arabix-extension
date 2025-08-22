@@ -114,20 +114,27 @@ function appendTextWithAnimation(selectedElement) {
 
 export const getTransliteration = async (word: string): Promise<string> => {
   return new Promise((resolve, reject) => {
-
+        const timeoutId = setTimeout(() => {
+      reject(new Error('Message response timeout'));
+    }, 30000);
     chrome.runtime.sendMessage(
       {
         type: "transliterate",
         payload: { text: word }
       },
       (response: { error?: string, data?: { text: string } }) => {
-        if (response.error) {
+        clearTimeout(timeoutId)
+        if (response?.error) {
           console.error("An error occured", response.error)
           reject(response.error)
-        } else {
-          // console.log("React: recieved response")
-          // console.log(response)
+        } else if (response?.data) {
+          console.log("React: recieved response")
+          console.log(response)
           resolve(response.data.text)
+        } else {
+          reject(new Error('Invalid response format'));
+          chrome.runtime.sendMessage({type: "createToast", message: "Invalid reponse format", toastType: "error"})
+          resolve(word)
         }
       }
     )
@@ -221,10 +228,10 @@ export const transliterateSelectedInput = async (current?: Element) => {
 
   // toggleModifyState(selectedElement)
   appendTextWithAnimation(selectedElement)
-  // console.log("Recieved text in client", text)
+  console.log("Recieved text in client", text)
   let isApiCallCounted = false
   for (let word of cleanSplittedWords(splitBySpaceOutOfIgnore(text))) {
-    // console.log("from content", word)
+    console.log("from content", word)
     let transliteratedWord = await getTransliteration(word);
 
     if (!isApiCallCounted && transliteratedWord != word) {
@@ -237,7 +244,7 @@ export const transliterateSelectedInput = async (current?: Element) => {
       loadingInt = null
       simulateUserTextInput(selectedElement, " ")
     };
-    // console.log(transliteratedWord)
+    console.log(transliteratedWord)
     animationQueue.push(transliteratedWord)
   }
   // toggleModifyState(selectedElement)

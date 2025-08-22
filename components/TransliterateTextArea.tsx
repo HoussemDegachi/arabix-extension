@@ -11,11 +11,11 @@ function TransliterateTextArea() {
         if (isRtl) setIsRtl(false)
         setText(e.target.value)
     }
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault()
         if (formRef.current && text.length != 0) {
           setIsRtl(true)
-          transliterateSelectedInput(formRef.current)
+          await transliterateSelectedInput(formRef.current)
         }
     }
   return (

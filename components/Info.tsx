@@ -11,7 +11,7 @@ function Info() {
     if (usageLog === undefined) return;
     setTodayUsage(usageLog[usageLog.length - 1].usage)
   }, [usageLog])
-  // console.log(todayUsage)
+  console.log(todayUsage)
   return (
     <div className="border-b-2 pb-py_small mb-px_base flex justify-between gap-2">
       <div>
