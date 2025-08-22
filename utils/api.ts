@@ -41,7 +41,6 @@ export const getApiTransliteration = async (word: string): (Promise<string> | nu
         const rawData = response.data; // JSON string
         const candidates = rawData["r"].split("|").map((x: string) => x.slice(0, -2));
 
-        console.log(candidates[0]);
         return candidates[0];
     } catch (error) {
         console.error("Error fetching transliteration:", error);

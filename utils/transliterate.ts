@@ -35,7 +35,6 @@ const divOrSpanChildren = Array.from(element.childNodes)
 }
 
 function simulateUserTextInput(el: Element, text: string) {
-  console.log(isAppendableTextArea(el))
   if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) {
     el.focus()
 
@@ -126,8 +125,8 @@ export const getTransliteration = async (word: string): Promise<string> => {
           console.error("An error occured", response.error)
           reject(response.error)
         } else {
-          console.log("React: recieved response")
-          console.log(response)
+          // console.log("React: recieved response")
+          // console.log(response)
           resolve(response.data.text)
         }
       }
@@ -156,7 +155,6 @@ const splitBySpaceOutOfIgnore = (str: string): string[] => {
   const normalSplit: string[] = str.split(" ")
   let i = 0
   while (i < normalSplit.length) {
-    console.log(i)
     if (!normalSplit[i].includes("/ignore{")) {
       res.push(normalSplit[i])
       i++
@@ -218,16 +216,15 @@ export const transliterateSelectedInput = async (current?: Element) => {
   if (!selectedElement) return
   const text = selectedElement[getAccessForInstanceType(selectedElement)]
   if (!text) return
-  console.log("Running animation")
   loadingInt = loadingTextAnimation(selectedElement)
 
 
   // toggleModifyState(selectedElement)
   appendTextWithAnimation(selectedElement)
-  console.log("Recieved text in client", text)
+  // console.log("Recieved text in client", text)
   let isApiCallCounted = false
   for (let word of cleanSplittedWords(splitBySpaceOutOfIgnore(text))) {
-    console.log("from content", word)
+    // console.log("from content", word)
     let transliteratedWord = await getTransliteration(word);
 
     if (!isApiCallCounted && transliteratedWord != word) {
@@ -240,7 +237,7 @@ export const transliterateSelectedInput = async (current?: Element) => {
       loadingInt = null
       simulateUserTextInput(selectedElement, " ")
     };
-    console.log(transliteratedWord)
+    // console.log(transliteratedWord)
     animationQueue.push(transliteratedWord)
   }
   // toggleModifyState(selectedElement)

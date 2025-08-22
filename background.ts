@@ -56,10 +56,10 @@ import { createToastByBackground, logInUser } from "~utils/background/helpers";
   chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
     if (request.type == "transliterate") {
       const { text } = request.payload
-      console.log(`Message recieve (translitrate): ${text}`)
+      // console.log(`Message recieve (translitrate): ${text}`)
       getApiTransliteration(text).then((res: string) => {
-        console.log("Recieved data")
-        console.log(res)
+        // console.log("Recieved data")
+        // console.log(res)
         return sendResponse({ data: { text: res } })
       }).catch((err) => {
         createToastByBackground(err, "error")
@@ -70,7 +70,7 @@ import { createToastByBackground, logInUser } from "~utils/background/helpers";
 
     if (request.type == "createToast") {
       const { message, toastType } = request.payload
-      console.log("Creating toast")
+      // console.log("Creating toast")
       createToastByBackground(message, toastType)
     }
 
@@ -80,7 +80,7 @@ import { createToastByBackground, logInUser } from "~utils/background/helpers";
       storage.set("usageLog", newUsageLog)
       storage.set("allTimeUsage", allTimeUsage + 1)
       if (!isUserLoggedIn || !storage.get("userId")) isUserLoggedIn = await logInUser()
-        console.log(logType, { numberOfWords, numberOfLetters })
+        // console.log(logType, { numberOfWords, numberOfLetters })
       posthog.capture(logType, { numberOfWords, numberOfLetters })
     }
   })

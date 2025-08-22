@@ -31,7 +31,7 @@ function Graph() {
   const initialObject = generateInitialUsage()
   const [usageLog, setUsageLog] = useStorage("usageLog", initialObject)
     useEffect(() => {
-    console.log("usageLog updated:", usageLog)
+    // console.log("usageLog updated:", usageLog)
   }, [usageLog])
 
     function createGradient(ctx: CanvasRenderingContext2D, area: ChartArea) {
