@@ -232,7 +232,7 @@ export const transliterateSelectedInput = async (current?: Element) => {
   // console.log("Recieved text in client", text)
   let isApiCallCounted = false
   for (let word of cleanSplittedWords(splitBySpaceOutOfIgnore(text))) {
-    console.log("from content", word)
+    // console.log("from content", word)
     let transliteratedWord = await getTransliteration(word);
 
     if (!isApiCallCounted && transliteratedWord != word) {
@@ -245,7 +245,7 @@ export const transliterateSelectedInput = async (current?: Element) => {
       loadingInt = null
       simulateUserTextInput(selectedElement, " ")
     };
-    console.log(transliteratedWord)
+    // console.log(transliteratedWord)
     animationQueue.push(transliteratedWord)
   }
   // toggleModifyState(selectedElement)

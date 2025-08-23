@@ -56,17 +56,17 @@ import { createToastByBackground, logInUser } from "~utils/background/helpers";
   chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.type == "transliterate") {
       const { text } = request.payload
-      console.log(`Message recieve (translitrate): ${text}`)
+      // console.log(`Message recieve (translitrate): ${text}`)
       getApiTransliteration(text).then((res: string | null) => {
         if (res == null) { sendResponse({ data: { data: text } }) }
         else {
 
-          console.log("Recieved data")
-          console.log(res)
+          // console.log("Recieved data")
+          // console.log(res)
           sendResponse({ data: { text: res } })
         }
       }).catch((err) => {
-        console.log("transliteration err", err)
+        // console.log("transliteration err", err)
         createToastByBackground(err, "error")
         sendResponse({ data: { text: text } })
       })
