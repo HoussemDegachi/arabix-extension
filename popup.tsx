@@ -1,5 +1,3 @@
-import { useState } from "react"
-
 import "./index.css"
 
 import Footer from "~components/Footer"

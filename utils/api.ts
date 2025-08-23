@@ -40,9 +40,10 @@ export const getApiTransliteration = async (word: string): (Promise<string> | nu
         const response = await axios.get(url);
         const rawData = response.data; // JSON string
         const candidates = rawData["r"].split("|").map((x: string) => x.slice(0, -2));
+        console.log(candidates[0])
         return candidates[0] || word;
     } catch (error) {
-        // console.error("Error fetching transliteration:", error);
+        console.error("Error fetching transliteration:", error);
         throw `Unable to make api calls: ${error.message}`
     }
 }

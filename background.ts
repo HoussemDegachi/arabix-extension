@@ -53,20 +53,20 @@ import { createToastByBackground, logInUser } from "~utils/background/helpers";
 
   let isUserLoggedIn = await logInUser()
 
-  chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
+  chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.type == "transliterate") {
       const { text } = request.payload
-      // console.log(`Message recieve (translitrate): ${text}`)
+      console.log(`Message recieve (translitrate): ${text}`)
       getApiTransliteration(text).then((res: string | null) => {
-        if (res == null) {sendResponse({data: {data: text}})}
+        if (res == null) { sendResponse({ data: { data: text } }) }
         else {
 
-          // console.log("Recieved data")
-          // console.log(res)
+          console.log("Recieved data")
+          console.log(res)
           sendResponse({ data: { text: res } })
         }
       }).catch((err) => {
-        // console.log("transliteration err", err)
+        console.log("transliteration err", err)
         createToastByBackground(err, "error")
         sendResponse({ data: { text: text } })
       })
@@ -84,21 +84,31 @@ import { createToastByBackground, logInUser } from "~utils/background/helpers";
       const newUsageLog: Usage = increaseUsage(usageLog)
       storage.set("usageLog", newUsageLog)
       storage.set("allTimeUsage", allTimeUsage + 1)
-      if (!isUserLoggedIn || !storage.get("userId")) isUserLoggedIn = await logInUser()
-        // console.log(logType, { numberOfWords, numberOfLetters })
+      if (!isUserLoggedIn || !storage.get("userId")) logInUser().then((res) => isUserLoggedIn = res)
+      // console.log(logType, { numberOfWords, numberOfLetters })
       posthog.capture(logType, { numberOfWords, numberOfLetters })
     }
   })
 
   chrome.commands.onCommand.addListener((command) => {
     if (command === "transliterateInput" && isAppRunning) {
-      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-        if (tabs[0].id) {
-          chrome.tabs.sendMessage(tabs[0].id, {
+      chrome.tabs.query({ active: true, currentWindow: true }, async (tabs) => {
+        const tabId = tabs[0]?.id;
+        if (!tabId) return;
+
+        try {
+          await chrome.scripting.executeScript({
+            target: { tabId },
+            files: ["content.06af5f40.js"]
+          });
+
+          chrome.tabs.sendMessage(tabId, {
             type: "getInputToTransliterate"
-          })
+          });
+        } catch (error) {
+          console.error("Failed to inject content script or send message:", error);
         }
-      })
+      });
     }
   })
 })()

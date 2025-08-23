@@ -124,6 +124,7 @@ export const getTransliteration = async (word: string): Promise<string> => {
       },
       (response: { error?: string, data?: { text: string } }) => {
         clearTimeout(timeoutId)
+        console.log("recieve response in content: ", response)
         if (response?.error) {
           // console.error("An error occured", response.error)
           reject(response.error)
@@ -231,7 +232,7 @@ export const transliterateSelectedInput = async (current?: Element) => {
   // console.log("Recieved text in client", text)
   let isApiCallCounted = false
   for (let word of cleanSplittedWords(splitBySpaceOutOfIgnore(text))) {
-    // console.log("from content", word)
+    console.log("from content", word)
     let transliteratedWord = await getTransliteration(word);
 
     if (!isApiCallCounted && transliteratedWord != word) {
@@ -244,7 +245,7 @@ export const transliterateSelectedInput = async (current?: Element) => {
       loadingInt = null
       simulateUserTextInput(selectedElement, " ")
     };
-    // console.log(transliteratedWord)
+    console.log(transliteratedWord)
     animationQueue.push(transliteratedWord)
   }
   // toggleModifyState(selectedElement)

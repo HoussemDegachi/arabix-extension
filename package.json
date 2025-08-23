@@ -10,7 +10,9 @@
   "manifest": {
     "permissions": [
       "commands",
-      "storage"
+      "storage",
+      "activeTab",
+      "scripting"
     ],
     "commands": {
       "transliterateInput": {
