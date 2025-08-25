@@ -1,7 +1,7 @@
 {
   "name": "arabix",
-  "displayName": "Arabix",
-  "version": "0.0.1",
+  "displayName": "Arabix - Instantly Convert Arabizi to Arabic",
+  "version": "0.0.2",
   "description": "Convert Arabizi (Arabic in Latin letters) to Arabic script instantly with a keyboard shortcut on most websites.",
   "author": "Houssem Degachi",
   "content_security_policy": {
@@ -13,6 +13,9 @@
       "storage",
       "activeTab",
       "scripting"
+    ],
+    "content_scripts": [
+      {}
     ],
     "commands": {
       "transliterateInput": {

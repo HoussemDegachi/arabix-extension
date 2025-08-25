@@ -5,7 +5,7 @@ import posthog from 'posthog-js/dist/module.no-external'
 import type { Usage } from "~types/Usage";
 import dayjs from "dayjs";
 import { getApiTransliteration } from "~utils/api";
-import { createToastByBackground, logInUser } from "~utils/background/helpers";
+import { createToastByBackground, isInjectablePage, logInUser } from "~utils/background/helpers";
 
 (async () => {
   const storage = new Storage();
@@ -73,6 +73,14 @@ import { createToastByBackground, logInUser } from "~utils/background/helpers";
       return true
     }
 
+    if (request.type == "isInjectable") {
+      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        const tab = tabs[0];
+        sendResponse({state: tab?.id && tab.url && isInjectablePage(tab.url)})
+      })
+      return true
+    }
+
     if (request.type == "createToast") {
       const { message, toastType } = request.payload
       // console.log("Creating toast")
@@ -92,23 +100,29 @@ import { createToastByBackground, logInUser } from "~utils/background/helpers";
 
   chrome.commands.onCommand.addListener((command) => {
     if (command === "transliterateInput" && isAppRunning) {
-      chrome.tabs.query({ active: true, currentWindow: true }, async (tabs) => {
-        const tabId = tabs[0]?.id;
-        if (!tabId) return;
+      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        const tab = tabs[0];
+        const tabId = tab?.id;
+        if (!tab?.id || !tab.url || !isInjectablePage(tab.url)) return
 
         try {
-          await chrome.scripting.executeScript({
-            target: { tabId },
-            files: ["content.06af5f40.js"]
-          });
+          if (tabId) {
+            chrome.scripting.executeScript({
+              target: { tabId },
+              files: ["content.06af5f40.js"]
+            }).then(() => {
+              chrome.tabs.sendMessage(tabId, {
+                type: "getInputToTransliterate"
+              });
+            })
+          }
 
-          chrome.tabs.sendMessage(tabId, {
-            type: "getInputToTransliterate"
-          });
+
         } catch (error) {
           console.error("Failed to inject content script or send message:", error);
         }
       });
+      return true
     }
   })
 })()

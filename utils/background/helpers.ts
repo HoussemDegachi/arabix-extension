@@ -13,6 +13,16 @@ export const createToastByBackground = (message, toastType) => {
   })
 }
 
+export const isInjectablePage = (url: string): boolean => {
+  const nonInjectableProtocols = [
+    'about:', 'chrome:', 'chrome-extension:',
+    'moz-extension:', 'firefox:', 'resource:',
+    'brave:', 'edge:'
+  ];
+  return !nonInjectableProtocols.some(protocol => url.startsWith(protocol));
+};
+
+
 export const logInUser = async () => {
   const storage = new Storage();
   let userId = await storage.get("userId")
