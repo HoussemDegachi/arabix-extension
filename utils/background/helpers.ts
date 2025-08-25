@@ -26,7 +26,7 @@ export const isInjectablePage = (url: string): boolean => {
 export const logInUser = async () => {
   const storage = new Storage();
   let userId = await storage.get("userId")
-  if (!userId) { userId = self.crypto.randomUUID(); storage.set("UserId", userId) }
+  if (!userId) { userId = self.crypto.randomUUID(); storage.set("userId", userId) }
   // console.log(`User id pulled from local storage: ${userId}`)
   try {
     posthog.identify(userId)
