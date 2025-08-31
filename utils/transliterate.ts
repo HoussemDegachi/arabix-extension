@@ -21,7 +21,7 @@ const getAccessForInstanceType = (selectedElement: Element): string => {
     selectedElement instanceof HTMLTextAreaElement
   )
     return "value"
-  else if (selectedElement instanceof HTMLElement) return "textContent"
+  else if (selectedElement instanceof HTMLElement) return "innerText"
   else return
 }
 
@@ -107,7 +107,9 @@ function appendTextWithAnimation(selectedElement) {
       animationQueue = animationQueue.slice(1)
       return
     }
-    simulateUserTextInput(selectedElement, text + word[0])
+    const emojiRegex = new RegExp(":[a-zA-Z0-9_+-]+:")
+    if (!emojiRegex.test(`${text}${word[0]}`))
+      simulateUserTextInput(selectedElement, text + word[0])
     animationQueue[0] = word.substring(1);
   }, 80)
 }
@@ -158,7 +160,31 @@ const toggleModifyState = (element: Element) => {
   currentState[getToggleStateForInstance(element)] = !currentState;
 }
 
+const getAllIndexes = (str: string, searchVal: string): number[] => {
+  const indexes = [];
+  let i = -1;
+  while ((i = str.indexOf(searchVal, i + 1)) !== -1) {
+    indexes.push(i);
+  }
+  return indexes;
+}
+
+
+const formatIgnoredElements = (text: string): string => {
+  const positions = getAllIndexes(text, "/ignore{")
+  let moves = 0
+  for (let position of positions) {
+    position += moves
+    if (position > 0 && text[position - 1] != " ") {
+      text = text.slice(0, position) + " " + text.slice(position)
+      moves++
+    }
+  }
+  return text
+}
+
 const splitBySpaceOutOfIgnore = (str: string): string[] => {
+  str = formatIgnoredElements(str)
   const res: string[] = []
   const normalSplit: string[] = str.split(" ")
   let i = 0
@@ -217,6 +243,16 @@ const countApiCall = async (text: string) => {
   })
 }
 
+const appendEmojis = (text: string, selectedElement: Element): string => {
+  const emojis = selectedElement.getElementsByTagName("img")
+  if (emojis.length == 0) return text
+  const regex = new RegExp("\n﻿*\n﻿*")
+  for (let emoji of emojis) {
+    text = text.replace(regex, `/ignore{${emoji.dataset.name}}`)
+  } 
+  return text
+}
+
 export const transliterateSelectedInput = async (current?: Element) => {
 
   let loadingInt;
@@ -230,10 +266,14 @@ export const transliterateSelectedInput = async (current?: Element) => {
   // toggleModifyState(selectedElement)
   appendTextWithAnimation(selectedElement)
   // console.log("Recieved text in client", text)
+
   let isApiCallCounted = false
-  for (let word of cleanSplittedWords(splitBySpaceOutOfIgnore(text))) {
+  console.log(cleanSplittedWords(splitBySpaceOutOfIgnore(appendEmojis(text, selectedElement))))
+  let resultedFullText = ""
+  for (let word of cleanSplittedWords(splitBySpaceOutOfIgnore(appendEmojis(text, selectedElement)))) {
     // console.log("from content", word)
     let transliteratedWord = await getTransliteration(word);
+    resultedFullText += `${transliteratedWord} `
 
     if (!isApiCallCounted && transliteratedWord != word) {
       isApiCallCounted = true
@@ -250,4 +290,11 @@ export const transliterateSelectedInput = async (current?: Element) => {
   }
   // toggleModifyState(selectedElement)
   animationQueue.push(null)
+  let refactoringInterval = setInterval(() => {
+    if (animationQueue.length == 0) {
+      console.log(resultedFullText) 
+      simulateUserTextInput(selectedElement, resultedFullText.trim())
+      clearInterval(refactoringInterval)
+    }
+  }, 10)
 }

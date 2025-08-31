@@ -24,6 +24,8 @@ export const isInjectablePage = (url: string): boolean => {
 
 
 export const logInUser = async () => {
+  if (process.env.NODE_ENV == "development") return false
+  
   const storage = new Storage();
   let userId = await storage.get("userId")
   if (!userId) { userId = self.crypto.randomUUID(); storage.set("userId", userId) }

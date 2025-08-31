@@ -87,7 +87,7 @@ import { createToastByBackground, isInjectablePage, logInUser } from "~utils/bac
       createToastByBackground(message, toastType)
     }
 
-    if (request.type == "log" && posthog_key) {
+    if (request.type == "log" && posthog_key && process.env.NODE_ENV != "development") {
       const { logType, numberOfWords, numberOfLetters } = request.payload
       const newUsageLog: Usage = increaseUsage(usageLog)
       storage.set("usageLog", newUsageLog)
@@ -109,7 +109,7 @@ import { createToastByBackground, isInjectablePage, logInUser } from "~utils/bac
           if (tabId) {
             chrome.scripting.executeScript({
               target: { tabId },
-              files: ["content.06af5f40.js"]
+              files: ["content.672cac6b.js"]
             }).then(() => {
               chrome.tabs.sendMessage(tabId, {
                 type: "getInputToTransliterate"
