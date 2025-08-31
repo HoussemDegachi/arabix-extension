@@ -38,3 +38,5 @@ export const logInUser = async () => {
   }
 
 }
+
+export const keepAlive = () => setInterval(chrome.runtime.getPlatformInfo, 20e3);

@@ -3,6 +3,7 @@ import TransliterateTextArea from './TransliterateTextArea'
 
 function QuickTransliterate() {
   const [isAvailable, setIsAvailable] = useState<boolean>(true)
+  
   useEffect(() => {
     chrome.runtime.sendMessage({type: "isInjectable"}, (res: {state: boolean}) => {
       setIsAvailable(res?.state)

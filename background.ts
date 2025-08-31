@@ -5,9 +5,15 @@ import posthog from 'posthog-js/dist/module.no-external'
 import type { Usage } from "~types/Usage";
 import dayjs from "dayjs";
 import { getApiTransliteration } from "~utils/api";
-import { createToastByBackground, isInjectablePage, logInUser } from "~utils/background/helpers";
+import { createToastByBackground, isInjectablePage, keepAlive, logInUser } from "~utils/background/helpers";
+
+
 
 (async () => {
+
+  chrome.runtime.onStartup.addListener(keepAlive);
+  keepAlive();
+
   const storage = new Storage();
   const today = dayjs().format("MMM D")
   let isAppRunning: boolean = await storage.get("isAppRunning");
@@ -109,7 +115,7 @@ import { createToastByBackground, isInjectablePage, logInUser } from "~utils/bac
           if (tabId) {
             chrome.scripting.executeScript({
               target: { tabId },
-              files: ["content.672cac6b.js"]
+              files: ["content.06af5f40.js"]
             }).then(() => {
               chrome.tabs.sendMessage(tabId, {
                 type: "getInputToTransliterate"
